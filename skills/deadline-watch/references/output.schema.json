@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "deadline-watch --json output",
+  "type": "object",
+  "required": ["schema", "generated_at", "timezone", "window_days", "urgent_days", "past_days", "items", "repos", "later_count", "old_count"],
+  "properties": {
+    "schema": {"const": "deadline-watch/1"},
+    "generated_at": {"type": "string"},
+    "timezone": {"type": "string"},
+    "window_days": {"type": "number"},
+    "urgent_days": {"type": "number"},
+    "past_days": {"type": "number"},
+    "later_count": {"type": "integer", "minimum": 0},
+    "old_count": {"type": "integer", "minimum": 0},
+    "items": {"type": "array", "items": {"$ref": "#/$defs/item"}},
+    "repos": {"type": "array", "items": {"$ref": "#/$defs/git"}}
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "required": ["title", "due", "due_in_seconds", "days_left", "status", "repo", "git", "actions", "needs_action", "summary"],
+      "properties": {
+        "title": {"type": "string"},
+        "due": {"type": "string"},
+        "due_in_seconds": {"type": "integer"},
+        "days_left": {"type": "integer"},
+        "status": {"enum": ["urgent", "soon", "overdue"]},
+        "repo": {"type": ["string", "null"]},
+        "git": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/git"}]},
+        "actions": {"type": "array", "items": {"enum": ["commit", "push", "set_upstream", "pull", "first_commit", "checkout_branch"]}},
+        "needs_action": {"type": "boolean"},
+        "summary": {"type": "string"}
+      }
+    },
+    "git": {
+      "type": "object",
+      "required": ["path", "state", "detail", "branch", "detached", "unborn", "upstream", "ahead", "behind", "uncommitted", "last_commit_age_seconds"],
+      "properties": {
+        "path": {"type": "string"},
+        "state": {"enum": ["ok", "not_a_repo", "missing_path", "outside_root", "git_missing", "error"]},
+        "detail": {"type": "string"},
+        "branch": {"type": ["string", "null"]},
+        "detached": {"type": "boolean"},
+        "unborn": {"type": "boolean"},
+        "upstream": {"type": ["string", "null"]},
+        "ahead": {"type": ["integer", "null"]},
+        "behind": {"type": ["integer", "null"]},
+        "last_commit_age_seconds": {"type": ["integer", "null"]},
+        "uncommitted": {
+          "type": "object",
+          "required": ["total", "staged", "modified", "untracked", "conflicted", "truncated"],
+          "properties": {"total": {"type": "integer"}, "staged": {"type": "integer"}, "modified": {"type": "integer"},
+                         "untracked": {"type": "integer"}, "conflicted": {"type": "integer"}, "truncated": {"type": "boolean"}}
+        }
+      }
+    }
+  }
+}

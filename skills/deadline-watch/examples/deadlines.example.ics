@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//deadline-watch//example//EN
+BEGIN:VTODO
+UID:demo-a3@example.invalid
+SUMMARY:Assignment 3
+DUE;TZID=America/Los_Angeles:20261118T235900
+DESCRIPTION:Synthetic example\nrepo: ~/demo/a3
+END:VTODO
+BEGIN:VEVENT
+UID:demo-proposal@example.invalid
+SUMMARY:Project proposal
+DTSTART:20261121T010000Z
+X-DEADLINE-REPO:~/demo/proposal
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-reading@example.invalid
+SUMMARY:Reading response 5
+DTSTART;VALUE=DATE:20261119
+END:VEVENT
+END:VCALENDAR

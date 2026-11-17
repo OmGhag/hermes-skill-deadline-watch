@@ -1,0 +1,8 @@
+# SYNTHETIC example data. Times without a zone are read in --tz (default: this machine's zone).
+deadlines:
+  - title: Assignment 3
+    due: 2026-11-18 23:59
+    repo: ~/demo/a3
+  - title: "Reading response 5"
+    due: 2026-11-19            # a date alone means the end of that day
+  - {title: Project proposal, due: "2026-11-20T17:00:00-08:00", repo: demo-proposal}
