@@ -97,10 +97,17 @@ meta = entry.get("metadata") or {}
 print("identifier      :", entry["identifier"])
 print("trust / verdict :", entry["trust_level"], "/", entry["scan_verdict"])
 print("install path    :", entry["install_path"])
-print("source revision :", meta.get("source_revision"), "(GitHub's root tree of the default branch when it was fetched)")
-print("expected tree   :", tree, "(git rev-parse HEAD^{tree} of the commit below)")
-print("pinned commit   :", commit)
-print("MATCH" if meta.get("source_revision") == tree else "MISMATCH: the default branch moved after the commit above")
+recorded = meta.get("source_revision")
+print("source revision :", recorded, "(what Hermes recorded when it fetched the default branch)")
+print("pinned commit   :", commit, "(git rev-parse HEAD)")
+print("root tree       :", tree, "(git rev-parse HEAD^{tree})")
+# Hermes' lock has been seen to hold the COMMIT sha; a tree sha would also identify the same content. Accept either, say which one matched.
+if recorded == commit:
+    print("MATCH (source revision = the pinned COMMIT sha)")
+elif recorded == tree:
+    print("MATCH (source revision = the root TREE sha of the pinned commit)")
+else:
+    print("MISMATCH: the recorded revision is neither the pinned commit nor its root tree; the default branch probably moved after the commit above")
 PY
 step "5. Ground truth: the installed script run directly on the demo files" python3 "$FRESH/skills/deadline-watch/scripts/deadline_watch.py" "$DEMO/deadlines.md" --repo "$DEMO/a3" --now "$NOW_ISO" --tz America/Los_Angeles
 step "6. One chat request, answered with the installed skill" timeout 300 "$HERMES" chat -Q -t terminal,skills --provider "$PROVIDER" -m "$MODEL" -q "$PROMPT"
@@ -110,4 +117,5 @@ if grep -E -q 'sk-[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{16,}|github_pat_|AKIA[0-9A-
   echo "ERROR: the transcript contains something that looks like a key; NOT written. Inspect $OUT.clean by hand." >&2; exit 1
 fi
 mv "$OUT.clean" "$TRANSCRIPT"; rm -rf "$DEMO"
+rm -f "$HERE/docs/install_transcript.FAILED.txt"       # a stale failure record from an earlier attempt must not sit next to a successful transcript
 echo "wrote $TRANSCRIPT (pinned commit $LOCAL_HEAD); review it, then commit it and put the hash in the A3 README"
